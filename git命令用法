@@ -1,0 +1,139 @@
+创建版本库分为两步： 
+mkdir learngit   首先，选择一个合适的地方，创建一个空目录
+git init      第二步，通过git init命令把这个目录变成Git可以管理的仓库
+
+添加文件到Git仓库，分两步：
+git add <file>     git add readme.txt
+git commit -m <message>    git commit -m "ADD GPL" 
+--------------------------------------------------------
+
+版本回退：git reset --hard HEAD^ 回退到上一个版本
+		  git reset --hard commit_id  回退到指定版本号的版本
+		  
+查看提交历史：git log  确定要回退到哪个版本
+			  git log --pretty=oneline  输出到一行
+			  
+查看命令历史：git reflog  确定要回到未来的哪个版本
+
+------------------------------------------------------------------	
+查看状态：git status
+
+工作区（Working Directory）：在电脑里能看到的目录
+
+版本库（Repository）：工作区有一个隐藏目录.git，这个不算工作区，而是Git的版本库。
+
+Git的版本库里存了很多东西，其中最重要的就是称为stage（或者叫index）的暂存区，
+还有Git为我们自动创建的第一个分支master，以及指向master的一个指针叫HEAD
+
+git add     把文件添加进去，实际上就是把文件修改添加到暂存区；
+
+git commit   提交更改，实际上就是把暂存区的所有内容提交到当前分支。
+---------------------------------------------------------------------------------------
+
+查看工作区和版本库里面最新版本的区别：git diff HEAD -- file
+
+丢弃工作区的修改：git checkout -- file
+
+丢弃已添加（add）到缓存区的修改（两步）：git reset HEAD <file>   git checkout -- file
+
+撤销已经经提交（commit）到分支上的修改： git reset --hard commit_id    （前提是没有推送到远程库）
+
+--------------------------------------------------------------------------------------------
+删除一个文件：git rm file
+
+用版本库里的版本替换工作区的版本:git checkout -- test.txt
+---------------------------------------------------------------------
+
+关联一个远程库：git remote add origin git@server-name:path/repo-name.git
+
+第一次推送master分支的所有内容：git push -u origin master
+
+此后推送最新修改：git push origin master
+
+从远程库克隆：git clone git@server-name:path/repo-name.git
+比如：git clone git@github.com:michaelliao/bootstrap.git
+
+--------------------------------------------------------------------
+
+查看分支：git branch
+
+创建分支：git branch <name>
+
+切换分支：git checkout <name>
+
+创建+切换分支：git checkout -b <name>
+
+合并某分支到当前分支：git merge <name>
+
+删除分支：git branch -d <name>
+
+用带参数的git log也可以看到分支的合并情况：
+git log --graph --pretty=oneline --abbrev-commit
+
+------------------------------------------------------------------
+普通模式合并（合并后的历史有分支）：git merge --no-ff -m "merge with no-ff" dev
+
+修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；
+
+当手头工作没有完成时，先把工作现场git stash一下，然后去修复bug，修复后，再git stash pop，回到工作现场；
+
+在master分支上修复的bug，想要合并到当前dev分支，可以用git cherry-pick <commit>命令，
+把bug提交的修改“复制”到当前分支，避免重复劳动。
+
+-----------------------------------------------------------------------------------------------------
+开发一个新feature，最好新建一个分支；
+
+如果要丢弃一个没有被合并过的分支，可以通过git branch -D <name>强行删除。
+
+----------------------------------------------------------------------------------------------------
+多人协作的工作模式通常是这样：
+
+首先，可以试图用git push origin <branch-name>推送自己的修改；
+
+如果推送失败，则因为远程分支比你的本地更新，需要先用git pull试图合并；
+
+如果合并有冲突，则解决冲突，并在本地提交；
+
+没有冲突或者解决掉冲突后，再用git push origin <branch-name>推送就能成功！
+
+如果git pull提示no tracking information，则说明本地分支和远程分支的链接关系没有创建，
+用命令git branch --set-upstream-to <branch-name> origin/<branch-name>。
+
+这就是多人协作的工作模式，一旦熟悉了，就非常简单。
+
+------------------------------------------------------------------------------------
+
+查看远程库信息，使用git remote -v；
+
+本地新建的分支如果不推送到远程，对其他人就是不可见的；
+
+从本地推送分支，使用git push origin branch-name，如果推送失败，先用git pull抓取远程的新提交；
+
+在本地创建和远程分支对应的分支，使用git checkout -b branch-name origin/branch-name，本地和远程分支的名称最好一致；
+
+建立本地分支和远程分支的关联，使用git branch --set-upstream branch-name origin/branch-name；
+
+从远程抓取分支，使用git pull，如果有冲突，要先处理冲突。
+
+---------------------------------------------------------------------------------------------------------------
+
+git rebase操作可以把本地未push的分叉提交历史整理成直线；
+
+rebase的目的是使得我们在查看历史提交的变化时更容易，因为分叉的提交需要三方对比。
+
+-------------------------------------------------------------------------------------
+
+命令git tag <tagname>用于新建一个标签，默认为HEAD，也可以指定一个commit id；比如：$ git tag v0.9 ee804e0
+
+命令git tag -a <tagname> -m "blablabla..."可以指定标签信息；比如：$ git tag -a v0.1 -m "version 0.1 released" e92743c
+
+命令git tag可以查看所有标签。
+
+命令git push origin <tagname>可以推送一个本地标签；
+
+命令git push origin --tags可以推送全部未推送过的本地标签；
+
+命令git tag -d <tagname>可以删除一个本地标签；
+
+命令git push origin :refs/tags/<tagname>可以删除一个远程标签。
+
